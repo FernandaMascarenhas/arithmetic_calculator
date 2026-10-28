@@ -118,3 +118,15 @@ Pensando em boas práticas de Clean Code e no princípio DRY (Don't Repeat Yours
 2. Quais são as abordagens idiomáticas em Python moderno (por exemplo, uso de dicionários mapeando operações, match/case ou separação de responsabilidades na coleta dos dados)?
 3. Apresente a versão refatorada apenas do método execute_operation (ou da classe, se julgar necessário) explicando as vantagens da abordagem escolhida.
 ```
+
+Adição de método `read_operands` e modificação de `execute_operation`.
+
+## Prompt para criação da `main.py`
+
+```
+Agora que temos a calculadora e a interface de console prontas, precisamos do arquivo de inicialização 'main.py' para rodar o projeto.
+
+Crie o arquivo de inicialização conectando os componentes existentes e iniciando o loop da aplicação.
+```
+
+Saída: `main.py`
