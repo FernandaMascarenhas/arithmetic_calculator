@@ -2,17 +2,19 @@
 
 **Modelo**: gemini-3.8-flash
 
-## System instructions
+## System Instructions
 
-```
+```text
 Você é um mentor especialista em Engenharia de Software e Python. Seu objetivo é ajudar no desenvolvimento de código limpo, modular e didático. Sempre utilize boas práticas (PEP 8, tipagem estática com type hints e tratamento adequado de erros). Ao explicar o código, seja direto, conceitual e estruture as respostas com clareza técnica.
 ```
 
-## Passo 1: Playground
+---
 
-### Prompt inicial
+## Passo 1: Planejamento Arquitetural
 
-```
+### Prompt Inicial
+
+```text
 Quero desenvolver uma calculadora em Python que realize as quatro operações básicas. Antes de escrever qualquer linha de código, quero estruturar o projeto.
 
 Me ajude a planejar a arquitetura da aplicação:
@@ -23,9 +25,9 @@ Me ajude a planejar a arquitetura da aplicação:
 Não gere a implementação completa do código agora; foque na estrutura conceitual e nas decisões de design.
 ```
 
-### Segundo prompt
+### Segundo Prompt: Eliminação de Abreviações e Conformidade PEP 8
 
-```
+```text
 Gostei da divisão de responsabilidades, mas não quero abreviações em nenhum ponto do projeto. Quero que todo o projeto seja padronizado em inglês, seguindo rigorosamente a PEP 8 (snake_case para pacotes, módulos, funções e métodos; PascalCase para classes).
 
 Por favor, faça apenas o seguinte:
@@ -35,11 +37,15 @@ Por favor, faça apenas o seguinte:
 Não escreva o código ainda.
 ```
 
-Saída do plano inicial: `arithmetic_calculator/plan.md`
+**Saída gerada:** `documentation/architectural_plan.md`
 
-## Prompt para geração da camada de domínio
+---
 
-```
+## Passo 2: Camada de Domínio (`ArithmeticCalculator`)
+
+### Prompt Enviado
+
+```text
 Gere apenas a implementação do módulo da camada de domínio ('domain/calculator.py'), contendo:
 
 - Tipagem estática estrita (type hints).
@@ -49,12 +55,15 @@ Gere apenas a implementação do módulo da camada de domínio ('domain/calculat
 Não implemente a interface de terminal ainda.
 ```
 
-Saída: `domain/calculator.py`
+**Saída gerada:** `domain/calculator.py`
 
-## Análise Conceitual e Casos de Borda
+---
 
-### Prompt enviado
-```
+## Passo 3: Análise Conceitual e Casos de Borda
+
+### Prompt Enviado
+
+```text
 Gostei da implementação de ArithmeticCalculator, mas quero aprofundar nos comportamentos em tempo de execução e entender possíveis vulnerabilidades antes de avançarmos.
 
 Poderia me explicar, de forma didática e conceitual:
@@ -66,18 +75,29 @@ Por favor, foque na explicação conceitual e nos prós e contras de cada aborda
 ```
 
 ### Decisões de Design Registradas
+
 1. **Fronteira de Validação (Clean Architecture):**
-   * O domínio (`ArithmeticCalculator`) mantém foco exclusivo no cálculo puro e no disparo de `ZeroDivisionError`.
-   * A camada de interface (`ConsoleUserInterface`) será a barreira de entrada responsável por sanitização, parsing (`float`) e captura de `ValueError`.
+* O domínio (`ArithmeticCalculator`) mantém foco exclusivo no cálculo puro e no disparo de `ZeroDivisionError`.
+* A camada de interface (`ConsoleUserInterface`) será a barreira de entrada responsável por sanitização, parsing (`float`) e captura de `ValueError`.
+
+
 2. **Tratamento de Strings em Runtime:**
-   * Type hints não validam tipos em execução; passar strings para `add` causaria concatenação acidental, reforçando a necessidade de validação na interface.
+* Type hints não validam tipos em execução; passar strings para `add` causaria concatenação acidental, reforçando a necessidade de validação na interface.
+
+
 3. **Ponto Flutuante (IEEE 754):**
-   * O uso de `float` é mantido para fins didáticos, ciente das limitações de precisão binária.
-   * A interface deve barrar strings literais como `"nan"`, `"inf"` e `"-inf"`, impedindo estados matemáticos indeterminados no domínio.
+* O uso de `float` é mantido para fins didáticos, ciente das limitações de precisão binária.
+* A interface deve barrar strings literais como `"nan"`, `"inf"` e `"-inf"`, impedindo estados matemáticos indeterminados no domínio.
 
-## Prompt para geração da interface
 
-```
+
+---
+
+## Passo 4: Camada de Interface (`ConsoleUserInterface`)
+
+### Prompt Enviado
+
+```text
 Agora quero implementar a camada de interface de console ('user_interface/console_interface.py').
 
 A aplicação deve permitir que o usuário:
@@ -96,21 +116,19 @@ Requisitos técnicos:
 Por favor, gere a implementação de 'console_interface.py' e explique brevemente como a interface se conecta à calculadora.
 ```
 
-Saída: `user_interface/console_interface.py`
-
 ### Como a Interface se Conecta à Calculadora
 
-A comunicação entre a camada de apresentação e a camada de domínio ocorre por meio de **Injeção de Dependência via construtor**:
+1. **Desacoplamento:** A classe `ConsoleUserInterface` recebe uma instância de `ArithmeticCalculator` via construtor (`__init__`), aplicando injeção de dependência.
+2. **Fronteira Clara de Responsabilidades:** A interface cuida do atrito com o console: sanitiza o input, rejeita literais perigosos (`nan`, `inf`), captura `ValueError` repetindo a pergunta e converte dados para `float`.
+3. **Resiliência a Falhas do Domínio:** A invocação das operações é protegida por um bloco `try...except ZeroDivisionError`, convertendo a exceção matemática em mensagem amigável sem quebrar o loop.
 
-1. **Desacoplamento:** A classe `ConsoleUserInterface` não instancia `ArithmeticCalculator` internamente com `ArithmeticCalculator()`. Em vez disso, ela recebe uma instância pronta através do método `__init__(self, calculator: ArithmeticCalculator)`.
-2. **Fronteira Clara de Responsabilidades:** 
-   * A interface cuida de todo o atrito com o mundo externo: lê o teclado, rejeita strings literais perigosas (`nan`, `inf`), captura `ValueError` repetindo a pergunta e traduz a opção escolhida.
-   * Quando os dados chegam à `self.calculator`, eles já são números válidos (`float`).
-3. **Resiliência a Falhas do Domínio:** Ao chamar `self.calculator.divide(...)`, a interface envolve a execução em um bloco `try...except ZeroDivisionError`. Isso intercepta a exceção levantada pelo domínio e a converte em uma mensagem amigável no console, impedindo a quebra do programa e permitindo que o loop continue normalmente.
+---
 
-### Prompt de revisão
+## Passo 5: Refatoração DRY e Dispatch Table
 
-```
+### Prompt de Revisão
+
+```text
 Gostei da implementação de ConsoleUserInterface, mas analisando o método execute_operation, notei que as linhas que solicitam os operandos com read_numeric_input se repetem de forma quase idêntica em todas as opções (1 a 4).
 
 Pensando em boas práticas de Clean Code e no princípio DRY (Don't Repeat Yourself):
@@ -119,21 +137,34 @@ Pensando em boas práticas de Clean Code e no princípio DRY (Don't Repeat Yours
 3. Apresente a versão refatorada apenas do método execute_operation (ou da classe, se julgar necessário) explicando as vantagens da abordagem escolhida.
 ```
 
-Adição de método `read_operands` e modificação de `execute_operation`.
+### Decisões da Refatoração
 
-## Prompt para criação da `main.py`
+* **Método `read_operands`:** Centraliza a leitura sanitizada dos dois operandos binários em uma tupla `tuple[float, float]`.
+* **Tabela de Despacho (*Dispatch Table*):** Dicionário mapeando a opção para uma tupla `tuple[Callable[[float, float], float], str]`, eliminando blocos `if/elif` repetitivos e aderindo ao Open/Closed Principle (OCP).
 
-```
+**Saída gerada:** `user_interface/console_interface.py` (atualizado)
+
+---
+
+## Passo 6: Bootstrap da Aplicação (`main.py`)
+
+### Prompt Enviado
+
+```text
 Agora que temos a calculadora e a interface de console prontas, precisamos do arquivo de inicialização 'main.py' para rodar o projeto.
 
 Crie o arquivo de inicialização conectando os componentes existentes e iniciando o loop da aplicação.
 ```
 
-Saída: `main.py`
+**Saída gerada:** `main.py`
 
-## Camada de testes
+---
 
-```
+## Passo 7: Camada de Testes Automatizados
+
+### Prompt Enviado
+
+```text
 Agora que a camada de domínio ('domain/calculator.py') e a interface estão prontas, quero adicionar uma camada de testes unitários para validar as operações da calculadora.
 
 Por favor, faça o seguinte:
@@ -144,5 +175,43 @@ Por favor, faça o seguinte:
 5. Mostre o comando de terminal para executar todos os testes.
 ```
 
-Saída: `tests/test_calculator.py`
+**Saída gerada:** `tests/test_calculator.py`
 
+---
+
+## Passo 8: Configuração do Git e Documentação Final
+
+### Prompt Enviado
+
+```text
+Para finalizar o projeto e prepará-lo para publicação no GitHub, preciso de dois arquivos de configuração e documentação:
+
+1. Um arquivo '.gitignore' configurado para projetos Python (ignorando __pycache__, arquivos de ambiente virtual, lixo de sistema operacional e IDEs).
+2. O arquivo 'README.md' completo do repositório, em inglês, contendo:
+   - Título e visão geral do projeto.
+   - Os princípios arquiteturais adotados (separação entre domínio e interface, uso de tabela de despacho/DRY e sanitização de entradas).
+   - A árvore final de diretórios do projeto (incluindo a pasta de testes e documentação).
+   - Instruções de como rodar a aplicação e como executar os testes automatizados com unittest.
+   - Tópico com as respostas conceituais para as perguntas do desafio (componentes principais, recebimento de dados e fluxo de execução).
+
+Gere o conteúdo pronto para ser salvo nesses dois arquivos.
+```
+
+**Saídas geradas:** `.gitignore` e `README.md`
+
+---
+
+## Validação e Execução
+
+### Testes Manuais de Terminal (`python3 main.py`)
+
+* [x] Sanitização de entradas com caracteres inválidos, aspas e alfanuméricos (repetição da solicitação com tratamento de `ValueError`).
+* [x] Bloqueio de literais especiais de ponto flutuante (`nan`, `inf`).
+* [x] Execução correta das quatro operações binárias com inteiros e números de ponto flutuante.
+* [x] Captura amigável de `ZeroDivisionError` sem interrupção do processo.
+* [x] Encerramento correto da aplicação com a opção 5.
+
+### Testes Automatizados (`python3 -m unittest --verbose`)
+
+* [x] 13 testes unitários cobrindo adição, subtração, multiplicação e divisão com números positivos, negativos e decimais (`assertAlmostEqual`).
+* [x] Validação de disparo e mensagem de exceção para divisão por zero (`assertRaises(ZeroDivisionError)`).
