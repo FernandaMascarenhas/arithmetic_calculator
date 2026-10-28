@@ -1,5 +1,5 @@
 """User interface module providing terminal interactions for the calculator."""
-
+from collections.abc import Callable
 from domain.calculator import ArithmeticCalculator
 
 
@@ -49,38 +49,41 @@ class ConsoleUserInterface:
             except ValueError:
                 print("Error: Invalid numeric input. Please enter a valid number.")
 
+    def read_operands(self) -> tuple[float, float]:
+        """Prompt the user for both binary arithmetic operands.
+
+        Returns:
+            A tuple containing the first operand and the second operand.
+        """
+        first_operand: float = self.read_numeric_input("Enter the first operand: ")
+        second_operand: float = self.read_numeric_input("Enter the second operand: ")
+        return first_operand, second_operand
+
     def execute_operation(self, selected_option: str) -> None:
-        """Gather operands, perform the calculation, and display results.
+        """Execute the arithmetic calculation corresponding to the selected option.
 
         Parameters:
             selected_option: The string identifier of the chosen menu option.
         """
-        if selected_option == "1":
-            first_operand: float = self.read_numeric_input("Enter the first operand: ")
-            second_operand: float = self.read_numeric_input("Enter the second operand: ")
-            result: float = self.calculator.add(first_operand, second_operand)
-            print(f"Result: {first_operand} + {second_operand} = {result}")
+        operation_mappings: dict[str, tuple[Callable[[float, float], float], str]] = {
+            "1": (self.calculator.add, "+"),
+            "2": (self.calculator.subtract, "-"),
+            "3": (self.calculator.multiply, "*"),
+            "4": (self.calculator.divide, "/"),
+        }
 
-        elif selected_option == "2":
-            first_operand: float = self.read_numeric_input("Enter the first operand: ")
-            second_operand: float = self.read_numeric_input("Enter the second operand: ")
-            result: float = self.calculator.subtract(first_operand, second_operand)
-            print(f"Result: {first_operand} - {second_operand} = {result}")
+        operation_function, mathematical_symbol = operation_mappings[selected_option]
 
-        elif selected_option == "3":
-            first_operand: float = self.read_numeric_input("Enter the first operand: ")
-            second_operand: float = self.read_numeric_input("Enter the second operand: ")
-            result: float = self.calculator.multiply(first_operand, second_operand)
-            print(f"Result: {first_operand} * {second_operand} = {result}")
+        first_operand, second_operand = self.read_operands()
 
-        elif selected_option == "4":
-            dividend: float = self.read_numeric_input("Enter the dividend: ")
-            divisor: float = self.read_numeric_input("Enter the divisor: ")
-            try:
-                result: float = self.calculator.divide(dividend, divisor)
-                print(f"Result: {dividend} / {divisor} = {result}")
-            except ZeroDivisionError as error:
-                print(f"Calculation Error: {error}")
+        try:
+            calculation_result: float = operation_function(first_operand, second_operand)
+            print(
+                f"Result: {first_operand} {mathematical_symbol} "
+                f"{second_operand} = {calculation_result}"
+            )
+        except ZeroDivisionError as error:
+            print(f"Calculation Error: {error}")
 
     def run_application_loop(self) -> None:
         """Execute the primary interaction loop until the user exits."""

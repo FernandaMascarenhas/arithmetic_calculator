@@ -107,3 +107,14 @@ A comunicação entre a camada de apresentação e a camada de domínio ocorre p
    * A interface cuida de todo o atrito com o mundo externo: lê o teclado, rejeita strings literais perigosas (`nan`, `inf`), captura `ValueError` repetindo a pergunta e traduz a opção escolhida.
    * Quando os dados chegam à `self.calculator`, eles já são números válidos (`float`).
 3. **Resiliência a Falhas do Domínio:** Ao chamar `self.calculator.divide(...)`, a interface envolve a execução em um bloco `try...except ZeroDivisionError`. Isso intercepta a exceção levantada pelo domínio e a converte em uma mensagem amigável no console, impedindo a quebra do programa e permitindo que o loop continue normalmente.
+
+### Prompt de revisão
+
+```
+Gostei da implementação de ConsoleUserInterface, mas analisando o método execute_operation, notei que as linhas que solicitam os operandos com read_numeric_input se repetem de forma quase idêntica em todas as opções (1 a 4).
+
+Pensando em boas práticas de Clean Code e no princípio DRY (Don't Repeat Yourself):
+1. Como podemos refatorar o método execute_operation para eliminar essa duplicação na leitura dos operandos?
+2. Quais são as abordagens idiomáticas em Python moderno (por exemplo, uso de dicionários mapeando operações, match/case ou separação de responsabilidades na coleta dos dados)?
+3. Apresente a versão refatorada apenas do método execute_operation (ou da classe, se julgar necessário) explicando as vantagens da abordagem escolhida.
+```
