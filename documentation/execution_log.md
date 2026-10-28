@@ -74,3 +74,36 @@ Por favor, foque na explicação conceitual e nos prós e contras de cada aborda
 3. **Ponto Flutuante (IEEE 754):**
    * O uso de `float` é mantido para fins didáticos, ciente das limitações de precisão binária.
    * A interface deve barrar strings literais como `"nan"`, `"inf"` e `"-inf"`, impedindo estados matemáticos indeterminados no domínio.
+
+## Prompt para geração da interface
+
+```
+Agora quero implementar a camada de interface de console ('user_interface/console_interface.py').
+
+A aplicação deve permitir que o usuário:
+- Veja um menu com as 4 operações básicas e uma opção de sair.
+- Escolha uma operação e digite os dois valores para o cálculo.
+- Veja o resultado formatado de forma clara.
+- Seja avisado caso digite valores inválidos (letras ou entradas que não façam sentido), sem que o programa trave.
+- Receba uma mensagem clara caso tente fazer uma divisão por zero.
+- Continue usando a calculadora até escolher explicitamente a opção de sair.
+
+Requisitos técnicos:
+- Utilize a classe ArithmeticCalculator implementada anteriormente para fazer os cálculos.
+- Aplique as decisões de validação e sanitização que discutimos na etapa anterior.
+- Mantenha o código limpo, em inglês, com type hints e seguindo a PEP 8.
+
+Por favor, gere a implementação de 'console_interface.py' e explique brevemente como a interface se conecta à calculadora.
+```
+
+Saída: `user_interface/console_interface.py`
+
+### Como a Interface se Conecta à Calculadora
+
+A comunicação entre a camada de apresentação e a camada de domínio ocorre por meio de **Injeção de Dependência via construtor**:
+
+1. **Desacoplamento:** A classe `ConsoleUserInterface` não instancia `ArithmeticCalculator` internamente com `ArithmeticCalculator()`. Em vez disso, ela recebe uma instância pronta através do método `__init__(self, calculator: ArithmeticCalculator)`.
+2. **Fronteira Clara de Responsabilidades:** 
+   * A interface cuida de todo o atrito com o mundo externo: lê o teclado, rejeita strings literais perigosas (`nan`, `inf`), captura `ValueError` repetindo a pergunta e traduz a opção escolhida.
+   * Quando os dados chegam à `self.calculator`, eles já são números válidos (`float`).
+3. **Resiliência a Falhas do Domínio:** Ao chamar `self.calculator.divide(...)`, a interface envolve a execução em um bloco `try...except ZeroDivisionError`. Isso intercepta a exceção levantada pelo domínio e a converte em uma mensagem amigável no console, impedindo a quebra do programa e permitindo que o loop continue normalmente.
