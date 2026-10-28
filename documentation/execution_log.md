@@ -46,5 +46,31 @@ Gere apenas a implementação do módulo da camada de domínio ('domain/calculat
 - Docstrings curtas em inglês para a classe e seus métodos.
 - Tratamento explícito de erros.
 
-Não implemente a interface de terminal ainda. 
+Não implemente a interface de terminal ainda.
 ```
+
+Saída: `domain/calculator.py`
+
+## Análise Conceitual e Casos de Borda
+
+### Prompt enviado
+```
+Gostei da implementação de ArithmeticCalculator, mas quero aprofundar nos comportamentos em tempo de execução e entender possíveis vulnerabilidades antes de avançarmos.
+
+Poderia me explicar, de forma didática e conceitual:
+1. O que acontece internamente se chamarmos os métodos passando strings numéricas (ex.: "10") ou strings alfanuméricas inválidas (ex.: "2f57r")? Como o Python reage a isso em tempo de execução, considerando que usamos type hints?
+2. Em termos de design de software (separação de responsabilidades), faz mais sentido blindar a classe de domínio contra esses valores inválidos ou delegar toda a validação e conversão de tipos para a camada de interface?
+3. Além da divisão por zero, existem outros casos de borda matemáticos ou limitações do tipo float no Python (como NaN, infinitos ou estouro de precisão) que valeria a pena tratar aqui?
+
+Por favor, foque na explicação conceitual e nos prós e contras de cada abordagem, sem gerar código de refatoração por enquanto.
+```
+
+### Decisões de Design Registradas
+1. **Fronteira de Validação (Clean Architecture):**
+   * O domínio (`ArithmeticCalculator`) mantém foco exclusivo no cálculo puro e no disparo de `ZeroDivisionError`.
+   * A camada de interface (`ConsoleUserInterface`) será a barreira de entrada responsável por sanitização, parsing (`float`) e captura de `ValueError`.
+2. **Tratamento de Strings em Runtime:**
+   * Type hints não validam tipos em execução; passar strings para `add` causaria concatenação acidental, reforçando a necessidade de validação na interface.
+3. **Ponto Flutuante (IEEE 754):**
+   * O uso de `float` é mantido para fins didáticos, ciente das limitações de precisão binária.
+   * A interface deve barrar strings literais como `"nan"`, `"inf"` e `"-inf"`, impedindo estados matemáticos indeterminados no domínio.
