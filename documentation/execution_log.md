@@ -130,3 +130,19 @@ Crie o arquivo de inicialização conectando os componentes existentes e inician
 ```
 
 Saída: `main.py`
+
+## Camada de testes
+
+```
+Agora que a camada de domínio ('domain/calculator.py') e a interface estão prontas, quero adicionar uma camada de testes unitários para validar as operações da calculadora.
+
+Por favor, faça o seguinte:
+1. Sugira onde posicionar a pasta de testes na estrutura de diretórios do projeto seguindo as boas práticas em Python.
+2. Gere a implementação do arquivo de testes unitários utilizando o framework nativo 'unittest'.
+3. Cubra as 4 operações básicas com números positivos, negativos, decimais e o caso de exceção de divisão por zero.
+4. Mantenha os testes limpos, em inglês, com asserções explícitas e nomes de métodos descritivos.
+5. Mostre o comando de terminal para executar todos os testes.
+```
+
+Saída: `tests/test_calculator.py`
+
