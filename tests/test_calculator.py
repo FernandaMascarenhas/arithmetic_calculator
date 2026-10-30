@@ -160,6 +160,46 @@ class TestArithmeticCalculator(unittest.TestCase):
             str(error_context.exception), "Division by zero is not allowed."
         )
 
+    # -------------------------------------------------------------------------
+    # Percentage Tests
+    # -------------------------------------------------------------------------
+
+    def test_calculate_percentage_positive_numbers(self) -> None:
+        """Ensure percentage calculation produces correct results with positive numbers."""
+        percentage: float = 20.0
+        base_value: float = 150.0
+        expected_result: float = 30.0
+
+        actual_result: float = self.calculator.calculate_percentage(
+            percentage, base_value
+        )
+
+        self.assertEqual(actual_result, expected_result)
+
+    def test_calculate_percentage_negative_numbers(self) -> None:
+        """Ensure percentage calculation handles negative values correctly."""
+        percentage: float = -10.0
+        base_value: float = 200.0
+        expected_result: float = -20.0
+
+        actual_result: float = self.calculator.calculate_percentage(
+            percentage, base_value
+        )
+
+        self.assertEqual(actual_result, expected_result)
+
+    def test_calculate_percentage_decimal_numbers(self) -> None:
+        """Ensure percentage calculation handles decimal values accurately."""
+        percentage: float = 12.5
+        base_value: float = 80.0
+        expected_result: float = 10.0
+
+        actual_result: float = self.calculator.calculate_percentage(
+            percentage, base_value
+        )
+
+        self.assertAlmostEqual(actual_result, expected_result, places=7)
+
 
 if __name__ == "__main__":
     unittest.main()

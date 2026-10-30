@@ -26,3 +26,7 @@ class ArithmeticCalculator:
             raise ZeroDivisionError("Division by zero is not allowed.")
 
         return dividend / divisor
+
+    def calculate_percentage(self, percentage: float, base_value: float) -> float:
+        """Calculate the specified percentage of a base value."""
+        return (percentage / 100.0) * base_value

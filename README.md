@@ -73,7 +73,7 @@ python main.py
 
 ## How to Run Automated Unit Tests
 
-The test suite is built on Python's standard `unittest` framework and covers positive numbers, negative numbers, floating-point precision (via `assertAlmostEqual`), and exception raising on division by zero.
+The test suite is built on Python's standard `unittest` framework and comprises **16 unit tests** covering addition, subtraction, multiplication, division, and percentage calculations across positive numbers, negative numbers, floating-point precision (via `assertAlmostEqual`), and exception raising on division by zero.
 
 Run all tests with detailed verbosity from the project root:
 
@@ -92,7 +92,7 @@ python -m unittest tests/test_calculator.py
 ## Conceptual Architecture Q&A
 
 ### 1. What are the primary components and their responsibilities?
-* **`ArithmeticCalculator` (Domain):** Encapsulates binary mathematical logic (`add`, `subtract`, `multiply`, `divide`). It produces numerical outputs or raises domain exceptions (`ZeroDivisionError`).
+* **`ArithmeticCalculator` (Domain):** Encapsulates binary mathematical logic (`add`, `subtract`, `multiply`, `divide`, `calculate_percentage`). It produces numerical outputs or raises domain exceptions (`ZeroDivisionError`).
 * **`ConsoleUserInterface` (User Interface):** Manages the terminal user lifecycle: displaying options, collecting string inputs, converting strings to floats, invoking the appropriate domain method, and printing formatted results.
 * **`main.py` (Composition Root):** Instantiates the dependencies, wires them together, and triggers the main application loop.
 
@@ -106,10 +106,10 @@ All terminal interactions pass through `ConsoleUserInterface.read_numeric_input`
 ### 3. What is the execution flow of an operation?
 1. The user starts the application via `main.py`.
 2. `ConsoleUserInterface.run_application_loop` renders the main menu.
-3. The user selects an option (`1` through `5`).
-4. If an arithmetic option (`1` to `4`) is chosen:
+3. The user selects an option (`1` through `6`).
+4. If an arithmetic option (`1` to `5`) is chosen:
    * The program retrieves the corresponding callable method and symbol from the dispatch table.
    * `read_operands` requests the two required numbers from the user.
    * The selected method on `ArithmeticCalculator` is invoked inside a `try...except ZeroDivisionError` block.
    * The formatted equation and result are displayed on the terminal.
-5. The menu reappears until option `5` (Exit application) is selected.
+5. The menu reappears until option `6` (Exit application) is selected.

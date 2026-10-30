@@ -215,3 +215,69 @@ Gere o conteúdo pronto para ser salvo nesses dois arquivos.
 
 * [x] 13 testes unitários cobrindo adição, subtração, multiplicação e divisão com números positivos, negativos e decimais (`assertAlmostEqual`).
 * [x] Validação de disparo e mensagem de exceção para divisão por zero (`assertRaises(ZeroDivisionError)`).
+
+---
+
+# Desafio 2 - Evolução Arquitetural: Operação de Porcentagem
+
+## Passo 1: Exploração e Análise Arquitetural
+
+### Prompt Enviado
+
+```text
+Tenho um projeto de calculadora em Python estruturado em arquitetura de camadas com separação entre domínio, interface de console e suíte de testes unitários.
+
+Por favor, analise os arquivos do projeto e explique:
+1. Como os módulos estão organizados e qual a responsabilidade de cada diretório ('domain/', 'user_interface/', 'tests/').
+2. Como a interface de console se comunica com a classe de cálculo matemático.
+3. Como os padrões de design adotados (como a tabela de despacho e o método read_operands) facilitam a adição de novas operações matemáticas.
+```
+
+### Síntese da Análise
+* Mapeamento das responsabilidades de cada pacote (`domain/`, `user_interface/` e `tests/`) e do ponto de composição (`main.py`).
+* Verificação da injeção de dependência de `ArithmeticCalculator` em `ConsoleUserInterface`.
+* Constatação de que a tabela de despacho (`operation_mappings`) e o método `read_operands` permitem estender o sistema com novas operações binárias respeitando o Princípio Aberto/Fechado (OCP) e DRY.
+
+---
+
+## Passo 2: Implementação do Cálculo de Porcentagem
+
+### Prompt Enviado
+
+```text
+Agora quero adicionar uma funcionalidade para calcular porcentagens (calculando X por cento de Y).
+
+Implemente essa operação mantendo a arquitetura e as funcionalidades existentes, seguindo o mesmo padrão de código do projeto, e explique quais alterações foram realizadas nos arquivos.
+```
+
+### Alterações Realizadas
+
+1. **Camada de Domínio (`domain/calculator.py`):**
+   * Adição do método `calculate_percentage(self, percentage: float, base_value: float) -> float` na classe `ArithmeticCalculator`, retornando `(percentage / 100.0) * base_value`.
+2. **Camada de Interface (`user_interface/console_interface.py`):**
+   * Inclusão da opção `5. Percentage` no menu (`display_menu`) e atualização da opção de saída para `6. Exit application`.
+   * Registro do mapeamento `"5": (self.calculator.calculate_percentage, "%")` na tabela de despacho (`operation_mappings`) em `execute_operation`, reaproveitando integralmente `read_operands` e a formatação de saída.
+   * Atualização de `valid_options` (`{"1", "2", "3", "4", "5", "6"}`) e da condição de parada em `run_application_loop`.
+3. **Suíte de Testes (`tests/test_calculator.py`):**
+   * Adição dos testes `test_calculate_percentage_positive_numbers`, `test_calculate_percentage_negative_numbers` e `test_calculate_percentage_decimal_numbers` na classe `TestArithmeticCalculator`.
+
+---
+
+## Passo 3: Validação e Execução da Suíte Completa de Testes
+
+### Prompt Enviado
+
+```text
+Instalei o Python no ambiente local. 
+
+Por favor, execute novamente a suíte completa de testes unitários para validar que tanto as operações antigas quanto a nova funcionalidade de porcentagem estão passando sem falhas.
+```
+
+### Resultado da Execução (`python -m unittest --verbose`)
+
+* [x] **16 testes unitários executados com sucesso (`OK`)**, cobrindo:
+  * Adição (positivos, negativos e decimais) — 3 testes.
+  * Subtração (positivos, negativos e decimais) — 3 testes.
+  * Multiplicação (positivos, negativos e decimais) — 3 testes.
+  * Divisão (positivos, negativos, decimais e exceção `ZeroDivisionError`) — 4 testes.
+  * Porcentagem (`calculate_percentage` com positivos, negativos e decimais) — 3 testes.

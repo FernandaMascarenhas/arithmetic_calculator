@@ -23,7 +23,8 @@ class ConsoleUserInterface:
         print("2. Subtraction")
         print("3. Multiplication")
         print("4. Division")
-        print("5. Exit application")
+        print("5. Percentage")
+        print("6. Exit application")
         print("========================================")
 
     def read_numeric_input(self, prompt_message: str) -> float:
@@ -70,6 +71,7 @@ class ConsoleUserInterface:
             "2": (self.calculator.subtract, "-"),
             "3": (self.calculator.multiply, "*"),
             "4": (self.calculator.divide, "/"),
+            "5": (self.calculator.calculate_percentage, "%"),
         }
 
         operation_function, mathematical_symbol = operation_mappings[selected_option]
@@ -87,17 +89,17 @@ class ConsoleUserInterface:
 
     def run_application_loop(self) -> None:
         """Execute the primary interaction loop until the user exits."""
-        valid_options: set[str] = {"1", "2", "3", "4", "5"}
+        valid_options: set[str] = {"1", "2", "3", "4", "5", "6"}
 
         while True:
             self.display_menu()
-            selected_option: str = input("Please select an option (1-5): ").strip()
+            selected_option: str = input("Please select an option (1-6): ").strip()
 
             if selected_option not in valid_options:
-                print("Error: Unrecognized option. Please choose a number between 1 and 5.")
+                print("Error: Unrecognized option. Please choose a number between 1 and 6.")
                 continue
 
-            if selected_option == "5":
+            if selected_option == "6":
                 print("Exiting application. Goodbye!")
                 break
 
